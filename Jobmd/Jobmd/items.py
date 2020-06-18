@@ -28,52 +28,56 @@ class JobDescItem(scrapy.Item):
 
 
 def salary_out_process(data2):
-    return data2[0].encode('utf-8')
+    return data2[0]
 
 
 def workingExp_out_process(data2):
-    return data2[2].encode('utf-8')
+    return data2[2]
 
 
 def education_out_process(data2):
-    return data2[3].encode('utf-8')
+    return data2[3]
 
 
 def workingType_out_process(data2):
-    return data2[4].encode('utf-8')
+    return data2[4]
 
 
 def location_out_process(data2):
-    return data2[1].encode('utf-8')
+    return data2[1]
 
 
 def major_out_process(data2):
-    return data2[0].encode('utf-8')
+    return data2[0]
 
 
 def techTitle_out_process(data2):
-    print("techTitle = ==============")
-    return data2[3].encode('utf-8')
+    return data2[3]
 
 
 def englishLevel_out_process(data2):
-    return data2[4].encode('utf-8')
+    res = ""
+    try:
+        res = data2[4]
+    except IndexError:
+        pass
+    return res
 
 
 def highLight_out_process(data2):
-    return " ".join(data2).encode("utf-8")
+    return " ".join(data2)
 
 
 def detailAddress_out_process(data2):
-    return data2[0].replace("\n", "").replace(" ", "").replace("    ", "").encode('utf-8')
+    return data2[0].replace("\n", "").replace(" ", "").replace("    ", "")
 
 
 def jobDesc_out_process(data2):
-    return data2[0].replace(" ", "").replace("\n", "").encode('utf-8')
+    return data2[0].replace(" ", "").replace("\n", "")
 
 
 def title_out_process(data2):
-    return data2[0].encode('utf-8')
+    return data2[0]
 
 
 class JobDescItemLoader(ItemLoader):

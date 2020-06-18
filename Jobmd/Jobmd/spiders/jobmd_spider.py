@@ -83,10 +83,17 @@ class JobmdSpider(scrapy.Spider):
         l.add_css('education', 'div.box-info_base span::text')
         l.add_css('workingType', 'div.box-info_base span::text')
         l.add_css('highLight', 'dl.work-welfare span')
-        jobDescSelector = response.css("div.work-content_box-detail dl.work-group")[2]
-        l.add_value('jobDesc', "".join(jobDescSelector.css("dd::text").getall()))
+        try:
+            jobDescSelector = response.css("div.work-content_box-detail dl.work-group")[2]
+            l.add_value('jobDesc', "".join(jobDescSelector.css("dd::text").getall()))
+        except IndexError:
+            self.logger.warn("职位描述缺失！")
+            l.add_value('jobDesc', "")
+
         l.add_css('detailAddress', 'div.work-location_content p::text')
         l.add_css('techTitle', 'ul.work-require li p::text')
         l.add_css('major', 'ul.work-require li p::text')
         l.add_css('englishLevel', 'ul.work-require li p::text')
+
+        self.logger.info(f'正在抓取 {response.request.url}')
         return l.load_item()
