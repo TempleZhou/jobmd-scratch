@@ -4,7 +4,7 @@ import re
 import sys
 from scrapy.cmdline import execute
 if __name__ == '__main__':
-    os.environ['DATA_DIR'] = os.path.dirname(__file__) + "/JsonData"
+    os.environ['DATA_DIR'] = os.path.abspath(os.curdir) + "/JsonData"
     try:
         os.mkdir(os.environ.get("DATA_DIR"))
     except FileExistsError:
