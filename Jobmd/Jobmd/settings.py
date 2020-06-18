@@ -64,9 +64,26 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'Jobmd.pipelines.JobmdPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'Jobmd.pipelines.JobmdPipeline': 300,
+}
+
+FEEDS = {
+    'items.json': {
+        'format': 'jsonlines',
+        'encoding': 'utf8',
+        'store_empty': False,
+        'fields': None,
+        # falls back to FEED_EXPORT_FIELDS
+        # When FEED_EXPORT_FIELDS is empty or None (default),
+        # Scrapy uses fields defined in dicts or Item subclasses a spider is yielding
+        'indent': 4,
+    },
+}
+
+FEED_EXPORTERS = {
+    'jsonlines': 'scrapy.exporters.JsonLinesItemExporter'
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
