@@ -14,6 +14,9 @@ BOT_NAME = 'Jobmd'
 SPIDER_MODULES = ['Jobmd.spiders']
 NEWSPIDER_MODULE = 'Jobmd.spiders'
 
+MONGO_URI = 'localhost'
+MONGO_DATABASE = 'Jobmd'
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'Jobmd (+http://www.yourdomain.com)'
@@ -66,6 +69,7 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'Jobmd.pipelines.JobmdPipeline': 300,
+    'Jobmd.pipelines.MongoPipeline' : 400
 }
 
 LOG_LEVEL = 'INFO'
