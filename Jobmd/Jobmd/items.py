@@ -7,11 +7,13 @@
 import scrapy
 from scrapy.loader import ItemLoader
 from w3lib.html import remove_tags
-from scrapy.loader.processors import MapCompose
+from scrapy.loader.processors import MapCompose, TakeFirst
 
 
 class JobDescItem(scrapy.Item):
     # define the fields for your item here like:
+    collectionName = scrapy.Field(output_processor=TakeFirst())
+    _id = scrapy.Field(output_processor=TakeFirst())
     title = scrapy.Field()
     location = scrapy.Field()
     salary = scrapy.Field()

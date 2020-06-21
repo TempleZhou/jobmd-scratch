@@ -68,8 +68,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'Jobmd.pipelines.JobmdPipeline': 300,
-    'Jobmd.pipelines.MongoPipeline' : 400
+    'Jobmd.pipelines.MongoPipeline': 400
 }
 
 LOG_LEVEL = 'INFO'

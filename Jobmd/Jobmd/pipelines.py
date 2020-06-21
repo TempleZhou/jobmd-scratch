@@ -32,12 +32,6 @@ class MongoPipeline:
         self.client.close()
 
     def process_item(self, item, spider):
-        self.db[self.collection_name].insert_one(dict(item))
-        return item
-
-class JobmdPipeline(object):
-    def process_item(self, item, spider):
-        with open(spider.file_url + "/job_desc.json", "a+") as f:
-            f.write(str(dict(item)))
-            f.write("\n")
+        item_dict = dict(item)
+        self.db[item.get('collectionName')].insert_one(dict(item))
         return item

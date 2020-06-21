@@ -41,12 +41,11 @@ class JobmdSpider(scrapy.Spider):
                         continue
 
                     try:
-                        dir_name = os.environ.get("DATA_DIR") + "/" +  menu_list_names[name_idx] + "/" + menu_content + "/" + menu_sub_content;
-                        self.logger.info(menu_sub_content_link);
-                        self.logger.info(dir_name);
+                        dir_name = menu_list_names[name_idx] + "-" + menu_content + "-" + menu_sub_content
+                        self.logger.info(menu_sub_content_link)
+                        self.logger.info(dir_name)
 
-                        self.content_list.append(dir_name);
-                        os.makedirs(dir_name)
+                        self.content_list.append(dir_name)
                     except:
                         pass
 
@@ -74,8 +73,10 @@ class JobmdSpider(scrapy.Spider):
         yield response.follow(next_page, cb_kwargs=dict(content_idx=content_idx), callback=self.parse_job_list)
 
     def parse_job_desc(self, response, content_idx):
-        self.file_url = self.content_list[content_idx]
+        collecton_name = self.content_list[content_idx]
         l = JobDescItemLoader(item=JobDescItem(), response=response)
+        l.add_value('collectionName', collecton_name)
+        l.add_value('_id', response.request.url)
         l.add_css('title', 'div.work-title_fixed-title h2::text')
         l.add_css('location', 'div.box-info_base span::text')
         l.add_css('salary', 'div.box-info_base span::text')
