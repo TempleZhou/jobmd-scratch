@@ -6,6 +6,7 @@ import collections
 
 import jieba
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.font_manager import FontProperties
 
 
@@ -93,3 +94,16 @@ def plot_with_labels(low_dim_embs, labels, filename='tsne.png'):
                      ha='right',
                      va='bottom')
     plt.savefig(filename)
+
+
+# 计算余弦相似度
+def cosine_similarity(x, y, norm=True):
+    assert len(x) == len(y), "len(x) != len(y)"
+    zero_list = [0] * len(x)
+    if x == zero_list or y == zero_list:
+        return float(1) if x == y else float(0)
+
+    res = np.array([[x[i] * y[i], x[i] * x[i], y[i] * y[i]] for i in range(len(x))])
+    cos = sum(res[:, 0]) / (np.sqrt(sum(res[:, 1])) * np.sqrt(sum(res[:, 2])))
+
+    return 0.5 * cos + 0.5 if norm else cos

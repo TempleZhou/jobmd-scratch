@@ -6,7 +6,7 @@ import tensorflow as tf
 from six.moves import xrange
 from sklearn.manifold import TSNE
 
-from LevelPredictor.word2vec import read_data, build_dataset, plot_with_labels
+from LevelPredictor.word2vec import read_data, build_dataset, plot_with_labels, cosine_similarity
 from LevelPredictor.word2vec.skip_gram_model import generate_batch, generate_graph
 
 if __name__ == '__main__':
@@ -93,3 +93,14 @@ if __name__ == '__main__':
     low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
     labels = [reverse_dictionary[i] for i in xrange(plot_only)]
     plot_with_labels(low_dim_embs, labels)
+
+    print(f'病人 -> {dictionary["病人"]}  vec: {final_embeddings[dictionary["病人"]]}')
+    print(f'患者 -> {dictionary["患者"]}  vec: {final_embeddings[dictionary["患者"]]}')
+    print(f'主任 -> {dictionary["主任"]}  vec: {final_embeddings[dictionary["主任"]]}')
+
+    a = final_embeddings[dictionary["病人"]].tolist()
+    b = final_embeddings[dictionary["患者"]].tolist()
+    c = final_embeddings[dictionary["主任"]].tolist()
+
+    print(f'病人:患者 余弦相似度 {cosine_similarity(a, b)}')
+    print(f'病人:主任 余弦相似度 {cosine_similarity(a, c)}')
