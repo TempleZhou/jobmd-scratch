@@ -22,45 +22,66 @@ import os
 import random
 import zipfile
 
+import jieba
 import numpy as np
+from matplotlib.font_manager import FontProperties
 from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
+
+def is_all_chinese(strs):
+    for _char in strs:
+        if not '\u4e00' <= _char <= '\u9fa5':
+            return False
+    return True
+
+
 # Step 1: Download the data.
-url = 'http://mattmahoney.net/dc/'
-
-
-def maybe_download(filename, expected_bytes):
-    """Download a file if not present, and make sure it's the right size."""
-    if not os.path.exists(filename):
-        filename, _ = urllib.request.urlretrieve(url + filename, filename)
-    statinfo = os.stat(filename)
-    if statinfo.st_size == expected_bytes:
-        print('Found and verified', filename)
-    else:
-        print(statinfo.st_size)
-        raise Exception(
-            'Failed to verify ' + filename + '. Can you get to it with a browser?')
-    return filename
-
-
-filename = maybe_download('text8.zip', 31344016)
-
-
 # Read the data into a list of strings.
-def read_data(filename):
-    """Extract the first file enclosed in a zip file as a list of words"""
-    with zipfile.ZipFile(filename) as f:
-        data = f.read(f.namelist()[0]).split()
-    return data
+def read_data():
+    try:
+        with open('../corpora_data/raw_words.txt', "r", encoding="UTF-8") as f:
+            lines = [word[:-1] for word in f.readlines()]
+            return lines
+    except FileNotFoundError:
+        pass
+
+    # 读取停用词
+    stop_words = []
+    with open('../corpora_data/stop_words.txt', "r", encoding="UTF-8") as f:
+        line = f.readline()
+        while line:
+            stop_words.append(line[:-1])
+            line = f.readline()
+    stop_words = set(stop_words)
+    print('停用词读取完毕，共{n}个词'.format(n=len(stop_words)))
+
+    # 读取文本，预处理，分词，得到词典
+    raw_words_list = []
+    with open('../corpora_data/corpora.txt', "r", encoding='UTF-8') as f:
+        line = f.readline()
+        while line:
+            while '\n' in line:
+                line = line.replace('\n', '')
+            while ' ' in line:
+                line = line.replace(' ', '')
+            if len(line) > 0:  # 如果句子非空
+                raw_words = list(jieba.cut(line, cut_all=False))
+                for raw_word in raw_words:
+                    if raw_word not in stop_words and is_all_chinese(raw_word):
+                        raw_words_list.append(raw_word)
+            line = f.readline()
+
+    with open('../corpora_data/raw_words.txt', "w", encoding="UTF-8") as f:
+        f.write("\n".join(raw_words_list))
+    return raw_words_list
 
 
-words = read_data(filename)
-print('Data size', len(words))
+words = read_data()
 
 # Step 2: Build the dictionary and replace rare words with UNK token.
-vocabulary_size = 50000
+vocabulary_size = 10000
 
 
 def build_dataset(words):
@@ -132,10 +153,21 @@ num_skips = 2  # How many times to reuse an input to generate a label.
 # We pick a random validation set to sample nearest neighbors. Here we limit the
 # validation samples to the words that have a low numeric ID, which by
 # construction are also the most frequent.
-valid_size = 16  # Random set of words to evaluate similarity on.
+valid_size = 9  # Random set of words to evaluate similarity on.
 valid_window = 100  # Only pick dev samples in the head of the distribution.
-valid_examples = np.random.choice(valid_window, valid_size, replace=False)
 num_sampled = 64  # Number of negative examples to sample.
+
+valid_word = ['主任',
+              '语言表达',
+              '观察',
+              '床头',
+              '护理',
+              '病人',
+              '研究成果',
+              '省部级',
+              '引进']
+valid_examples = [dictionary[li] for li in valid_word]
+graph = tf.Graph()
 
 graph = tf.Graph()
 
@@ -156,14 +188,14 @@ with graph.as_default():
         nce_weights = tf.Variable(
             tf.truncated_normal([vocabulary_size, embedding_size],
                                 stddev=1.0 / math.sqrt(embedding_size)))
-        nce_biases = tf.Variable(tf.zeros([vocabulary_size]))
+        nce_biases = tf.Variable(tf.zeros([vocabulary_size]), dtype=tf.float32)
 
     # Compute the average NCE loss for the batch.
     # tf.nce_loss automatically draws a new sample of the negative labels each
     # time we evaluate the loss.
     loss = tf.reduce_mean(
-        tf.nn.nce_loss(nce_weights, nce_biases, embed, train_labels,
-                       num_sampled, vocabulary_size))
+        tf.nn.nce_loss(weights=nce_weights, biases=nce_biases, inputs=embed, labels=train_labels,
+                       num_sampled=num_sampled, num_classes=vocabulary_size))
 
     # Construct the SGD optimizer using a learning rate of 1.0.
     optimizer = tf.train.GradientDescentOptimizer(1.0).minimize(loss)
@@ -171,13 +203,14 @@ with graph.as_default():
     # Compute the cosine similarity between minibatch examples and all embeddings.
     norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
     normalized_embeddings = embeddings / norm
-    valid_embeddings = tf.nn.embedding_lookup(
-        normalized_embeddings, valid_dataset)
-    similarity = tf.matmul(
-        valid_embeddings, normalized_embeddings, transpose_b=True)
+    valid_embeddings = tf.nn.embedding_lookup(normalized_embeddings, valid_dataset)
+    similarity = tf.matmul(valid_embeddings, normalized_embeddings, transpose_b=True)
+
+    # Add variable initializer.
+    init = tf.global_variables_initializer()
 
 # Step 5: Begin training.
-num_steps = 100001
+num_steps = 30001
 
 with tf.Session(graph=graph) as session:
     # We must initialize all variables before we use them.
@@ -226,6 +259,7 @@ def plot_with_labels(low_dim_embs, labels, filename='tsne.png'):
         x, y = low_dim_embs[i, :]
         plt.scatter(x, y)
         plt.annotate(label,
+                     fontproperties=FontProperties(fname='/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf'),
                      xy=(x, y),
                      xytext=(5, 2),
                      textcoords='offset points',
