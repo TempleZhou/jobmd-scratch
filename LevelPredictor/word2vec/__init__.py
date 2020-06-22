@@ -12,11 +12,27 @@ from matplotlib.font_manager import FontProperties
 
 
 # 判断是否全为中文
+from config import ROOT_DIR
+
+
 def is_all_chinese(text):
     for _char in text:
         if not '\u4e00' <= _char <= '\u9fa5':
             return False
     return True
+
+
+def read_stop_words():
+    # 读取停用词
+    stop_words = []
+    with open(f'{ROOT_DIR}/corpora_data/stop_words.txt', "r", encoding="UTF-8") as f:
+        line = f.readline()
+        while line:
+            stop_words.append(line[:-1])
+            line = f.readline()
+    stop_words = set(stop_words)
+    print('停用词读取完毕，共{n}个词'.format(n=len(stop_words)))
+    return stop_words
 
 
 # 读取数据
@@ -28,15 +44,7 @@ def read_data():
     except FileNotFoundError:
         pass
 
-    # 读取停用词
-    stop_words = []
-    with open('../corpora_data/stop_words.txt', "r", encoding="UTF-8") as f:
-        line = f.readline()
-        while line:
-            stop_words.append(line[:-1])
-            line = f.readline()
-    stop_words = set(stop_words)
-    print('停用词读取完毕，共{n}个词'.format(n=len(stop_words)))
+    stop_words = read_stop_words()
 
     # 读取文本，预处理，分词，得到词典
     raw_words_list = []
