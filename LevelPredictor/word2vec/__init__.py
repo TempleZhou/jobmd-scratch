@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import collections
+import pickle
 
 import jieba
 import matplotlib.pyplot as plt
@@ -21,8 +22,8 @@ def is_all_chinese(text):
 # 读取数据
 def read_data():
     try:
-        with open('../corpora_data/raw_words.txt', "r", encoding="UTF-8") as f:
-            lines = [word[:-1] for word in f.readlines()]
+        with open('../corpora_data/raw_words.bin', "rb") as f:
+            lines = pickle.load(f)
             return lines
     except FileNotFoundError:
         pass
@@ -48,13 +49,15 @@ def read_data():
                 line = line.replace(' ', '')
             if len(line) > 0:  # 如果句子非空
                 raw_words = list(jieba.cut(line, cut_all=False))
+                sentance = []
                 for raw_word in raw_words:
                     if raw_word not in stop_words and is_all_chinese(raw_word):
-                        raw_words_list.append(raw_word)
+                        sentance.append(raw_word)
+                raw_words_list.append(sentance)
             line = f.readline()
 
-    with open('../corpora_data/raw_words.txt', "w", encoding="UTF-8") as f:
-        f.write("\n".join(raw_words_list))
+    with open('../corpora_data/raw_words.bin', "wb") as f:
+        pickle.dump(raw_words_list, f)
     return raw_words_list
 
 

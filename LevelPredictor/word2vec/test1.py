@@ -2,6 +2,8 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
+from itertools import chain
+
 import tensorflow as tf
 from six.moves import xrange
 from sklearn.manifold import TSNE
@@ -14,7 +16,7 @@ if __name__ == '__main__':
     vocabulary_size = 10000
 
     words = read_data()
-
+    words = [x for sublist in words for x in sublist]
     data, count, dictionary, reverse_dictionary = build_dataset(vocabulary_size, words)
 
     del words  # 释放内存
