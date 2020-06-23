@@ -3,11 +3,10 @@ import os
 import pickle
 
 import jieba
-import numpy as np
-from gensim.models import word2vec
+from gensim.models import Doc2Vec
 from sklearn import svm
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
 from LevelPredictor.config import ROOT_DIR
@@ -19,8 +18,8 @@ if __name__ == '__main__':
 
     model = None
     # 加载模型
-    if os.path.isfile(f"{ROOT_DIR}/word2vec/word2vec.model"):
-        model = word2vec.Word2Vec.load(f"{ROOT_DIR}/word2vec/word2vec.model")
+    if os.path.isfile(f"{ROOT_DIR}/word2vec/doc2vec.model"):
+        model = Doc2Vec.load(f"{ROOT_DIR}/word2vec/doc2vec.model")
     else:
         raise Exception
 
@@ -32,10 +31,9 @@ if __name__ == '__main__':
         raw_words = list(jieba.cut(text, cut_all=False))
         for raw_word in raw_words:
             if raw_word not in stop_words and is_all_chinese(raw_word):
-                sentance.append(model.wv[raw_word])
+                sentance.append(raw_word)
         if len(sentance) > 0:
-            avg_vec = np.sum(sentance, axis=0)/len(sentance)
-            X.append(avg_vec.tolist())
+            X.append(model.infer_vector(sentance))
             Y.append(label)
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, Y, test_size=0.3, random_state=11)

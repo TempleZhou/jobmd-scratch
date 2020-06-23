@@ -11,7 +11,7 @@ if __name__ == '__main__':
     sens_list = read_data()
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-    if False:
+    if os.path.isfile("word2vec.model"):
         model = word2vec.Word2Vec.load("word2vec.model")
     else:
         # sg=0 使用 CBOW 模型 sg=1 使用 skip-gram
