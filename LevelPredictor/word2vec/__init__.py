@@ -38,7 +38,7 @@ def read_stop_words():
 # 读取数据
 def read_data():
     try:
-        with open('../corpora_data/raw_words.bin', "rb") as f:
+        with open(f'{ROOT_DIR}/corpora_data/raw_words.bin', "rb") as f:
             lines = pickle.load(f)
             return lines
     except FileNotFoundError:
@@ -48,7 +48,7 @@ def read_data():
 
     # 读取文本，预处理，分词，得到词典
     raw_words_list = []
-    with open('../corpora_data/corpora.txt', "r", encoding='UTF-8') as f:
+    with open(f'{ROOT_DIR}/corpora_data/corpora.txt', "r", encoding='UTF-8') as f:
         line = f.readline()
         while line:
             while '\n' in line:
@@ -64,7 +64,7 @@ def read_data():
                 raw_words_list.append(sentance)
             line = f.readline()
 
-    with open('../corpora_data/raw_words.bin', "wb") as f:
+    with open(f'{ROOT_DIR}/corpora_data/raw_words.bin', "wb") as f:
         pickle.dump(raw_words_list, f)
     return raw_words_list
 

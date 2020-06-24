@@ -5,14 +5,14 @@ import os
 
 from gensim.models import word2vec
 
-from LevelPredictor.word2vec import read_data, cosine_similarity
+from word2vec import read_data, cosine_similarity
 
 if __name__ == '__main__':
     sens_list = read_data()
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-    if os.path.isfile("word2vec.model"):
-        model = word2vec.Word2Vec.load("word2vec.model")
+    if os.path.isfile("word2vec/word2vec.model"):
+        model = word2vec.Word2Vec.load("word2vec/wword2vec.model")
     else:
         # sg=0 使用 CBOW 模型 sg=1 使用 skip-gram
         model = word2vec.Word2Vec(sens_list, sg=0, size=128, min_count=1, iter=20, batch_words=10000)

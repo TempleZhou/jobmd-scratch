@@ -8,8 +8,8 @@ import tensorflow as tf
 from six.moves import xrange
 from sklearn.manifold import TSNE
 
-from LevelPredictor.word2vec import read_data, build_dataset, plot_with_labels, cosine_similarity
-from LevelPredictor.word2vec.skip_gram_model import generate_batch, generate_graph
+from word2vec import read_data, build_dataset, plot_with_labels, cosine_similarity
+from word2vec.skip_gram_model import generate_batch, generate_graph
 
 if __name__ == '__main__':
 

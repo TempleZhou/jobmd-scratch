@@ -10,8 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from tqdm import tqdm
 
-from LevelPredictor.config import ROOT_DIR
-from LevelPredictor.word2vec import read_stop_words, is_all_chinese
+from config import ROOT_DIR
+from word2vec import read_stop_words, is_all_chinese
 
 # 加载停用词
 stop_words = read_stop_words()
