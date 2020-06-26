@@ -27,13 +27,13 @@ if __name__ == '__main__':
     Y = []
     stop_words = read_stop_words()
     for (text, label) in tqdm(corpora_label):
-        sentance = []
+        sentence = []
         raw_words = list(jieba.cut(text, cut_all=False))
         for raw_word in raw_words:
             if raw_word not in stop_words and is_all_chinese(raw_word):
-                sentance.append(raw_word)
-        if len(sentance) > 0:
-            X.append(model.infer_vector(sentance))
+                sentence.append(raw_word)
+        if len(sentence) > 0:
+            X.append(model.infer_vector(sentence))
             Y.append(label)
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, Y, test_size=0.3, random_state=11)

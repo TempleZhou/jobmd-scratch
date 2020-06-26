@@ -6,12 +6,12 @@ import jieba
 import numpy as np
 from gensim.models import word2vec
 from sklearn import svm
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
 from tqdm import tqdm
 
 from config import ROOT_DIR
-from word2vec import read_stop_words, is_all_chinese
+from word2vec import read_stop_words, is_all_chinese, plot_pca_scatter
 
 # 加载停用词
 stop_words = read_stop_words()
@@ -49,9 +49,13 @@ if __name__ == '__main__':
             X.append(sentence)
             Y.append(label)
 
-    X_train, X_valid, y_train, y_valid = train_test_split(X, Y, test_size=0.3)
+    X_train, X_valid, y_train, y_valid = train_test_split(X, Y, test_size=0.3, random_state=18)
 
-    clf = svm.SVC(kernel='linear', probability=True)
+    # 降维可视化
+    plot_pca_scatter(X_train[:1000], y_train[:1000])
+
+    # gamma 默认使用 1/（ X 的方差 0.5 * X 的样本数量）
+    clf = svm.SVC(kernel='rbf', gamma=0.015, probability=True)
     clf.fit(X_train, y_train)
 
     with open(f"{ROOT_DIR}/clf.model", "wb") as f:

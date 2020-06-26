@@ -9,9 +9,9 @@ import jieba
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.font_manager import FontProperties
-
-
 # 判断是否全为中文
+from sklearn.decomposition import PCA
+
 from config import ROOT_DIR
 
 
@@ -57,15 +57,17 @@ def read_data():
                 line = line.replace(' ', '')
             if len(line) > 0:  # 如果句子非空
                 raw_words = list(jieba.cut(line, cut_all=False))
-                sentance = []
+                sentence = []
                 for raw_word in raw_words:
                     if raw_word not in stop_words and is_all_chinese(raw_word):
-                        sentance.append(raw_word)
-                raw_words_list.append(sentance)
+                        sentence.append(raw_word)
+                raw_words_list.append(sentence)
             line = f.readline()
 
     with open(f'{ROOT_DIR}/corpora_data/raw_words.bin', "wb") as f:
         pickle.dump(raw_words_list, f)
+    with open(f'{ROOT_DIR}/corpora_data/raw_words.txt', "w") as f:
+        f.writelines(["\t".join(sentence) + "\n" for sentence in raw_words_list])
     return raw_words_list
 
 
@@ -105,6 +107,19 @@ def plot_with_labels(low_dim_embs, labels, filename='tsne.png'):
                      ha='right',
                      va='bottom')
     plt.savefig(filename)
+
+
+# 降维可视化
+def plot_pca_scatter(X_train, y_train):
+    estimator = PCA(n_components=2)
+    X_pca = estimator.fit_transform(X_train)
+    colors = ['blue', 'red']
+    for i in range(len(colors)):
+        px = X_pca[np.array(y_train) == i, 0]
+        py = X_pca[np.array(y_train) == i, 1]
+        plt.scatter(px, py, c=colors[i])
+    plt.legend(np.arange(0, 10).astype(str))
+    plt.savefig('pca.png')
 
 
 # 计算余弦相似度
