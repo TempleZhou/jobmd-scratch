@@ -12,7 +12,7 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
     if os.path.isfile("word2vec/word2vec.model"):
-        model = word2vec.Word2Vec.load("word2vec/wword2vec.model")
+        model = word2vec.Word2Vec.load("word2vec/word2vec.model")
     else:
         # sg=0 使用 CBOW 模型 sg=1 使用 skip-gram
         model = word2vec.Word2Vec(sens_list, sg=0, size=128, min_count=1, iter=20, batch_words=10000)
