@@ -3,7 +3,7 @@ import pickle
 import pymongo
 
 if __name__ == '__main__':
-    myclient = pymongo.MongoClient('mongodb://gtx1080ti:27017/')
+    myclient = pymongo.MongoClient('mongodb://localhost:27017/')
 
     db_list = myclient.list_database_names()
     db_name = 'Jobmd'

@@ -16,7 +16,7 @@ if __name__ == '__main__':
     else:
         # sg=0 使用 CBOW 模型 sg=1 使用 skip-gram
         model = word2vec.Word2Vec(sens_list, sg=0, size=128, min_count=1, iter=20, batch_words=10000)
-        model.save("word2vec.model")
+        model.save("word2vec/word2vec.model")
 
     print(f'病人 vec: {model.wv["病人"]}')
     print(f'患者 vec: {model.wv["患者"]}')
